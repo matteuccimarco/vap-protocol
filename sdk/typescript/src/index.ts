@@ -7,11 +7,11 @@
  */
 
 // Types
-export * from './types';
+export * from './types/index.js';
 
 // Crypto utilities
-export * from './crypto';
+export * from './crypto/index.js';
 
 // Client
-export { VAP, InMemoryStorage } from './client';
-export type { StorageBackend } from './client';
+export { VAP, InMemoryStorage } from './client/index.js';
+export type { StorageBackend } from './client/index.js';

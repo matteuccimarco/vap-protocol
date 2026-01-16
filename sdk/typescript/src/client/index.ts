@@ -7,13 +7,14 @@
 import {
   hashObject,
   hashString,
+  sign,
   signRecord,
   verifyRecordSignature,
   computeRecordId,
   getPublicKey,
   generateAgentId,
   generateNonce,
-} from '../crypto';
+} from '../crypto/index.js';
 import type {
   VAPConfig,
   VAPRecord,
@@ -24,8 +25,7 @@ import type {
   Bytes32,
   Constraint,
   AgentRegistration,
-} from '../types';
-import { VAPError, VAP_ERROR_CODES } from '../types';
+} from '../types/index.js';
 
 // ============================================================================
 // Storage Interface (to be implemented by specific backends)
@@ -203,7 +203,6 @@ export class VAP {
 
     // Sign the registration
     const registrationHash = hashObject(registration);
-    const { sign } = await import('../crypto');
     const signature = await sign(registrationHash, this.config.privateKey);
 
     const signedRegistration: AgentRegistration = {

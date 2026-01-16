@@ -9,11 +9,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "build": "tsc",
     "test": "vitest",
     "test:run": "vitest run",
-    "lint": "eslint src/",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [

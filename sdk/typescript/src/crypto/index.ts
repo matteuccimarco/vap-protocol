@@ -189,7 +189,9 @@ export async function verifyRecordSignature(
   }
 
   // Recompute record ID to ensure it matches
-  const computedId = computeRecordId(record);
+  // Need to exclude signature when computing
+  const { signature: _sig, ...recordWithoutSig } = record;
+  const computedId = computeRecordId(recordWithoutSig);
   if (computedId !== record.recordId) {
     return false;
   }
