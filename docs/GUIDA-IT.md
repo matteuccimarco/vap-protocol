@@ -162,13 +162,21 @@ console.log('Chiave pubblica:', publicKey);
 ### 3. Inizializza il client VAP
 
 ```typescript
+import { VAP, SlimStorageBackend } from '@vap/sdk';
+
+// Usa SLIM-CHAIN come storage (raccomandato)
+const storage = new SlimStorageBackend('http://localhost:3100');
+
 const vap = new VAP({
   privateKey: process.env.AGENT_PRIVATE_KEY,
   modelId: 'il-mio-agente-v1',
-});
+}, storage);
 
 await vap.initialize();
 ```
+
+> **Nota**: Se non specifichi uno storage backend, VAP usa `InMemoryStorage` (solo per test).
+> Per produzione, usa `SlimStorageBackend` con il gateway SLIM-RPC.
 
 ### 4. Registra l'agente
 
@@ -583,6 +591,57 @@ import {
 | `computeRecordId(record)` | Calcola ID di un record |
 | `signRecord(record, privateKey)` | Firma un record |
 | `verifyRecordSignature(record, publicKey)` | Verifica firma record |
+
+### Storage Backends
+
+VAP supporta diversi backend di storage. Lo storage determina dove vengono salvati i record.
+
+#### SlimStorageBackend (Raccomandato)
+
+```typescript
+import { VAP, SlimStorageBackend } from '@vap/sdk';
+
+const storage = new SlimStorageBackend({
+  endpoint: 'http://localhost:3100',  // Gateway SLIM-RPC
+  apiKey: 'optional-api-key',          // Opzionale
+  timeout: 30000,                      // Timeout in ms
+  useSlimFormat: true,                 // Usa formato SLIM (40% più efficiente)
+});
+
+const vap = new VAP(config, storage);
+```
+
+**Vantaggi di SLIM-RPC:**
+- **40-50% risparmio banda** rispetto a JSON-RPC
+- Caching automatico per chiamate read-only
+- Compatibile con qualsiasi blockchain (Ethereum, Polygon, etc.)
+
+#### InMemoryStorage (Solo Test)
+
+```typescript
+import { VAP, InMemoryStorage } from '@vap/sdk';
+
+const storage = new InMemoryStorage();
+const vap = new VAP(config, storage);
+```
+
+Usato solo per test locali. I dati vengono persi al riavvio.
+
+#### Custom Backend
+
+Puoi creare il tuo backend implementando l'interfaccia `StorageBackend`:
+
+```typescript
+interface StorageBackend {
+  submitRecord(record: VAPRecord): Promise<{ recordId: Bytes32; txHash?: string }>;
+  getRecord(recordId: Bytes32): Promise<VAPRecord | null>;
+  getAgentRecords(agentId: Bytes32, options?: QueryOptions): Promise<VAPRecord[]>;
+  getLatestRecord(agentId: Bytes32): Promise<VAPRecord | null>;
+  getAgent(agentId: Bytes32): Promise<AgentRegistration | null>;
+  registerAgent(registration: AgentRegistration): Promise<void>;
+  getAgentPublicKey(agentId: Bytes32): Promise<string | null>;
+}
+```
 
 ---
 

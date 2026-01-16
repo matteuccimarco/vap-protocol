@@ -15,3 +15,7 @@ export * from './crypto/index.js';
 // Client
 export { VAP, InMemoryStorage } from './client/index.js';
 export type { StorageBackend } from './client/index.js';
+
+// Storage backends
+export { SlimStorageBackend } from './storage/index.js';
+export type { SlimStorageConfig } from './storage/index.js';
